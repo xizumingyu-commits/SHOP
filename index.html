@@ -40,6 +40,9 @@ h1{
 
 .btn-area{
     margin-bottom:15px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
 button{
@@ -60,6 +63,11 @@ button{
     color:white;
 }
 
+.image-btn{
+    background:#4a90e2;
+    color:white;
+}
+
 /* 表格 */
 
 .table-wrapper{
@@ -69,7 +77,7 @@ button{
 table{
     width:100%;
     border-collapse:collapse;
-    min-width:850px;
+    min-width:750px;
 }
 
 th, td{
@@ -86,11 +94,11 @@ th{
 /* 欄位大小 */
 
 .image-column{
-    width:120px;
+    width:130px;
 }
 
 .name-column{
-    width:120px;
+    width:140px;
 }
 
 .price-column{
@@ -110,7 +118,7 @@ th{
 }
 
 .action-column{
-    width:80px;
+    width:100px;
 }
 
 /* 輸入框 */
@@ -137,6 +145,11 @@ input[type="number"]{
     object-fit:cover;
     border-radius:10px;
     border:1px solid #ccc;
+    display:none;
+}
+
+.image-upload{
+    display:none;
 }
 
 /* 小計 */
@@ -251,14 +264,23 @@ input[type="number"]{
 
 <td>
 
-<img class="preview-img"
-     src="https://via.placeholder.com/60">
+<img class="preview-img">
 
-<br><br>
+<br>
 
 <input type="file"
+       class="image-upload"
        accept="image/*"
        onchange="previewImage(this)">
+
+<br>
+
+<button class="image-btn"
+        onclick="openImageUpload(this)">
+
+新增圖片
+
+</button>
 
 </td>
 
@@ -457,14 +479,23 @@ function addProduct(){
 
 <td>
 
-<img class="preview-img"
-     src="https://via.placeholder.com/60">
+<img class="preview-img">
 
-<br><br>
+<br>
 
 <input type="file"
+       class="image-upload"
        accept="image/*"
        onchange="previewImage(this)">
+
+<br>
+
+<button class="image-btn"
+        onclick="openImageUpload(this)">
+
+新增圖片
+
+</button>
 
 </td>
 
@@ -539,6 +570,15 @@ function deleteRow(button){
     calculateTotal();
 }
 
+// 開啟圖片選擇
+
+function openImageUpload(button){
+
+    const td = button.parentElement;
+
+    td.querySelector(".image-upload").click();
+}
+
 // 圖片預覽
 
 function previewImage(input){
@@ -551,10 +591,15 @@ function previewImage(input){
 
         reader.onload = function(e){
 
+            const td =
+                input.parentElement;
+
             const img =
-                input.parentElement.querySelector(".preview-img");
+                td.querySelector(".preview-img");
 
             img.src = e.target.result;
+
+            img.style.display = "block";
 
             saveData();
         };
@@ -650,11 +695,15 @@ function addEventListeners(){
 
     document.querySelectorAll("input").forEach(input => {
 
-        input.removeEventListener("input",
-                                  calculateTotal);
+        input.removeEventListener(
+            "input",
+            calculateTotal
+        );
 
-        input.addEventListener("input",
-                               calculateTotal);
+        input.addEventListener(
+            "input",
+            calculateTotal
+        );
     });
 }
 

@@ -147,7 +147,7 @@ input[type="number"]{
     margin-top:4px;
 }
 
-/* 浮動按鈕 */
+/* 浮動新增按鈕 */
 
 .floating-btn{
     position:fixed;
@@ -167,6 +167,33 @@ input[type="number"]{
 
 .floating-btn:hover{
     background:#444;
+}
+
+/* 滿額禮 */
+
+.gift-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+}
+
+.gift-result{
+    margin-top:15px;
+    font-size:18px;
+    font-weight:bold;
+    color:#d60000;
+    line-height:1.8;
+}
+
+.delete-gift-btn{
+    background:#ff4d4f;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:6px 10px;
+    cursor:pointer;
 }
 
 /* 手機 */
@@ -201,6 +228,8 @@ input[type="number"]{
 <div class="container">
 
 <h1>周邊購物計算器</h1>
+
+<!-- 商品 -->
 
 <div class="card">
 
@@ -322,9 +351,66 @@ input[type="number"]{
 
 </div>
 
+<!-- 滿額禮 -->
+
+<div class="card">
+
+<h2>滿額禮</h2>
+
+<div id="giftContainer">
+
+<div class="gift-row">
+
+滿
+
+<input type="number"
+       class="gift-threshold"
+       value="3000"
+       min="0">
+
+元送
+
+<input type="text"
+       class="gift-name"
+       value="明信片">
+
+<button class="delete-gift-btn"
+        onclick="deleteGift(this)">
+
+刪除
+
+</button>
+
 </div>
 
-<!-- 浮動新增按鈕 -->
+</div>
+
+<button onclick="addGift()"
+        style="
+        background:#222;
+        color:white;
+        border:none;
+        border-radius:10px;
+        padding:10px 14px;
+        cursor:pointer;
+        ">
+
+＋ 新增滿額禮
+
+</button>
+
+<div id="giftResult"
+     class="gift-result">
+
+尚未達到滿額禮門檻
+
+</div>
+
+</div>
+
+</div>
+
+<!-- 浮動新增商品 -->
 
 <button class="floating-btn"
         onclick="addProduct()">
@@ -366,7 +452,7 @@ function calculateTotal(){
         const limit =
             parseInt(limitInput.value) || 1;
 
-        // 限購判斷
+        // 限購
 
         if(quantity > limit){
 
@@ -392,6 +478,8 @@ function calculateTotal(){
 
     document.getElementById("grandTotal").textContent =
         total;
+
+    checkGift(total);
 
     saveData();
 }
@@ -512,13 +600,107 @@ function previewImage(input){
 
             img.src = e.target.result;
 
-            // 有圖片才顯示
             img.style.display = "block";
 
             saveData();
         };
 
         reader.readAsDataURL(file);
+    }
+}
+
+// 新增滿額禮
+
+function addGift(){
+
+    const container =
+        document.getElementById("giftContainer");
+
+    const div =
+        document.createElement("div");
+
+    div.className = "gift-row";
+
+    div.innerHTML = `
+
+滿
+
+<input type="number"
+       class="gift-threshold"
+       value="0"
+       min="0">
+
+元送
+
+<input type="text"
+       class="gift-name"
+       value="新滿額禮">
+
+<button class="delete-gift-btn"
+        onclick="deleteGift(this)">
+
+刪除
+
+</button>
+
+`;
+
+    container.appendChild(div);
+
+    addEventListeners();
+
+    calculateTotal();
+}
+
+// 刪除滿額禮
+
+function deleteGift(button){
+
+    button.closest(".gift-row").remove();
+
+    calculateTotal();
+}
+
+// 檢查滿額禮
+
+function checkGift(total){
+
+    const thresholds =
+        document.querySelectorAll(".gift-threshold");
+
+    const names =
+        document.querySelectorAll(".gift-name");
+
+    let gifts = [];
+
+    thresholds.forEach((item, index) => {
+
+        const threshold =
+            parseInt(item.value) || 0;
+
+        const name =
+            names[index].value;
+
+        if(total >= threshold &&
+           name.trim() !== ""){
+
+            gifts.push(name);
+        }
+    });
+
+    const result =
+        document.getElementById("giftResult");
+
+    if(gifts.length > 0){
+
+        result.innerHTML =
+            "🎁 可獲得滿額禮：<br>" +
+            gifts.join("<br>");
+
+    }else{
+
+        result.innerHTML =
+            "尚未達到滿額禮門檻";
     }
 }
 
@@ -547,11 +729,14 @@ function saveData(){
     const data = {
 
         products:
-            document.querySelector("#productTable tbody").innerHTML
+            document.querySelector("#productTable tbody").innerHTML,
+
+        gifts:
+            document.getElementById("giftContainer").innerHTML
     };
 
     localStorage.setItem(
-        "shoppingCalculatorData",
+        "shoppingCalculatorData_v3",
         JSON.stringify(data)
     );
 }
@@ -562,7 +747,7 @@ function loadData(){
 
     const saved =
         localStorage.getItem(
-            "shoppingCalculatorData"
+            "shoppingCalculatorData_v3"
         );
 
     if(saved){
@@ -572,6 +757,9 @@ function loadData(){
 
         document.querySelector("#productTable tbody").innerHTML =
             data.products;
+
+        document.getElementById("giftContainer").innerHTML =
+            data.gifts;
     }
 
     addEventListeners();

@@ -30,42 +30,14 @@ h1{
     margin-bottom:20px;
 }
 
+/* 卡片 */
+
 .card{
     background:white;
     border-radius:20px;
     padding:15px;
     margin-bottom:20px;
     box-shadow:0 2px 10px rgba(0,0,0,0.08);
-}
-
-.btn-area{
-    margin-bottom:15px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-button{
-    border:none;
-    padding:10px 16px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:14px;
-}
-
-.add-btn{
-    background:#222;
-    color:white;
-}
-
-.delete-btn{
-    background:#ff4d4f;
-    color:white;
-}
-
-.image-btn{
-    background:#4a90e2;
-    color:white;
 }
 
 /* 表格 */
@@ -91,14 +63,14 @@ th{
     background:#efefef;
 }
 
-/* 欄位大小 */
+/* 欄位 */
 
 .image-column{
-    width:130px;
+    width:120px;
 }
 
 .name-column{
-    width:140px;
+    width:120px;
 }
 
 .price-column{
@@ -118,7 +90,7 @@ th{
 }
 
 .action-column{
-    width:100px;
+    width:80px;
 }
 
 /* 輸入框 */
@@ -146,10 +118,8 @@ input[type="number"]{
     border-radius:10px;
     border:1px solid #ccc;
     display:none;
-}
-
-.image-upload{
-    display:none;
+    margin:auto;
+    margin-bottom:8px;
 }
 
 /* 小計 */
@@ -177,14 +147,26 @@ input[type="number"]{
     margin-top:4px;
 }
 
-/* 滿額禮 */
+/* 浮動按鈕 */
 
-.giftResult{
-    margin-top:15px;
-    font-size:18px;
-    font-weight:bold;
-    color:#d60000;
-    line-height:1.8;
+.floating-btn{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:none;
+    background:#222;
+    color:white;
+    font-size:32px;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    z-index:999;
+}
+
+.floating-btn:hover{
+    background:#444;
 }
 
 /* 手機 */
@@ -203,9 +185,10 @@ input[type="number"]{
         font-size:24px;
     }
 
-    button{
-        padding:8px 12px;
-        font-size:12px;
+    .floating-btn{
+        width:55px;
+        height:55px;
+        font-size:28px;
     }
 }
 
@@ -220,17 +203,6 @@ input[type="number"]{
 <h1>周邊購物計算器</h1>
 
 <div class="card">
-
-<div class="btn-area">
-
-<button class="add-btn"
-        onclick="addProduct()">
-
-＋ 新增商品
-
-</button>
-
-</div>
 
 <div class="table-wrapper">
 
@@ -266,21 +238,9 @@ input[type="number"]{
 
 <img class="preview-img">
 
-<br>
-
 <input type="file"
-       class="image-upload"
        accept="image/*"
        onchange="previewImage(this)">
-
-<br>
-
-<button class="image-btn"
-        onclick="openImageUpload(this)">
-
-新增圖片
-
-</button>
 
 </td>
 
@@ -328,8 +288,15 @@ input[type="number"]{
 
 <td>
 
-<button class="delete-btn"
-        onclick="deleteRow(this)">
+<button onclick="deleteRow(this)"
+        style="
+        background:#ff4d4f;
+        color:white;
+        border:none;
+        border-radius:10px;
+        padding:8px 12px;
+        cursor:pointer;
+        ">
 
 刪除
 
@@ -355,51 +322,16 @@ input[type="number"]{
 
 </div>
 
-<!-- 滿額禮 -->
-
-<div class="card">
-
-<h2>滿額禮設定</h2>
-
-<div id="giftArea">
-
-<div class="giftRow"
-     style="margin-bottom:10px;">
-
-滿
-
-<input type="number"
-       class="giftThreshold"
-       value="3000"
-       min="0">
-
-元獲得
-
-<input type="text"
-       class="giftName"
-       value="明信片">
-
 </div>
 
-</div>
+<!-- 浮動新增按鈕 -->
 
-<button class="add-btn"
-        onclick="addGift()">
+<button class="floating-btn"
+        onclick="addProduct()">
 
-＋ 新增滿額禮
+＋
 
 </button>
-
-<div id="giftResult"
-     class="giftResult">
-
-尚未達到滿額禮門檻
-
-</div>
-
-</div>
-
-</div>
 
 <script>
 
@@ -461,8 +393,6 @@ function calculateTotal(){
     document.getElementById("grandTotal").textContent =
         total;
 
-    checkGift(total);
-
     saveData();
 }
 
@@ -481,21 +411,9 @@ function addProduct(){
 
 <img class="preview-img">
 
-<br>
-
 <input type="file"
-       class="image-upload"
        accept="image/*"
        onchange="previewImage(this)">
-
-<br>
-
-<button class="image-btn"
-        onclick="openImageUpload(this)">
-
-新增圖片
-
-</button>
 
 </td>
 
@@ -543,8 +461,15 @@ function addProduct(){
 
 <td>
 
-<button class="delete-btn"
-        onclick="deleteRow(this)">
+<button onclick="deleteRow(this)"
+        style="
+        background:#ff4d4f;
+        color:white;
+        border:none;
+        border-radius:10px;
+        padding:8px 12px;
+        cursor:pointer;
+        ">
 
 刪除
 
@@ -570,15 +495,6 @@ function deleteRow(button){
     calculateTotal();
 }
 
-// 開啟圖片選擇
-
-function openImageUpload(button){
-
-    const td = button.parentElement;
-
-    td.querySelector(".image-upload").click();
-}
-
 // 圖片預覽
 
 function previewImage(input){
@@ -591,101 +507,18 @@ function previewImage(input){
 
         reader.onload = function(e){
 
-            const td =
-                input.parentElement;
-
             const img =
-                td.querySelector(".preview-img");
+                input.parentElement.querySelector(".preview-img");
 
             img.src = e.target.result;
 
+            // 有圖片才顯示
             img.style.display = "block";
 
             saveData();
         };
 
         reader.readAsDataURL(file);
-    }
-}
-
-// 新增滿額禮
-
-function addGift(){
-
-    const area =
-        document.getElementById("giftArea");
-
-    const div =
-        document.createElement("div");
-
-    div.className = "giftRow";
-
-    div.style.marginBottom = "10px";
-
-    div.innerHTML = `
-
-滿
-
-<input type="number"
-       class="giftThreshold"
-       value="0"
-       min="0">
-
-元獲得
-
-<input type="text"
-       class="giftName"
-       value="新滿額禮">
-
-`;
-
-    area.appendChild(div);
-
-    addEventListeners();
-
-    calculateTotal();
-}
-
-// 滿額禮判斷
-
-function checkGift(total){
-
-    const thresholds =
-        document.querySelectorAll(".giftThreshold");
-
-    const names =
-        document.querySelectorAll(".giftName");
-
-    let gifts = [];
-
-    thresholds.forEach((item, index) => {
-
-        const threshold =
-            parseInt(item.value) || 0;
-
-        const name =
-            names[index].value;
-
-        if(total >= threshold &&
-           name.trim() !== ""){
-
-            gifts.push(name);
-        }
-    });
-
-    const result =
-        document.getElementById("giftResult");
-
-    if(gifts.length > 0){
-
-        result.innerHTML =
-            "🎁 可獲得滿額禮：<br>" +
-            gifts.join("<br>");
-
-    }else{
-
-        result.innerHTML =
-            "尚未達到滿額禮門檻";
     }
 }
 
@@ -714,10 +547,7 @@ function saveData(){
     const data = {
 
         products:
-            document.querySelector("#productTable tbody").innerHTML,
-
-        gifts:
-            document.getElementById("giftArea").innerHTML
+            document.querySelector("#productTable tbody").innerHTML
     };
 
     localStorage.setItem(
@@ -742,9 +572,6 @@ function loadData(){
 
         document.querySelector("#productTable tbody").innerHTML =
             data.products;
-
-        document.getElementById("giftArea").innerHTML =
-            data.gifts;
     }
 
     addEventListeners();

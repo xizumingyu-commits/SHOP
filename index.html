@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
 
 <meta charset="UTF-8">
@@ -47,7 +48,7 @@ h1{
 table{
     width:100%;
     border-collapse:collapse;
-    min-width:900px;
+    min-width:1100px;
 }
 
 th, td{
@@ -62,6 +63,10 @@ th{
 }
 
 /* 欄位 */
+
+.checkbox-column{
+    width:70px;
+}
 
 .name-column{
     width:140px;
@@ -79,7 +84,7 @@ th{
 }
 
 .action-column{
-    width:90px;
+    width:180px;
 }
 
 /* 輸入框 */
@@ -96,6 +101,11 @@ input[type="text"]{
 
 input[type="number"]{
     width:60px;
+}
+
+input[type="checkbox"]{
+    width:20px;
+    height:20px;
 }
 
 /* 圖片 */
@@ -145,10 +155,15 @@ input[type="number"]{
     border-radius:10px;
     padding:8px 12px;
     cursor:pointer;
+    margin:2px;
 }
 
 .delete-btn{
     background:#ff4d4f;
+}
+
+.move-btn{
+    background:#666;
 }
 
 /* 浮動新增按鈕 */
@@ -167,6 +182,13 @@ input[type="number"]{
     cursor:pointer;
     box-shadow:0 4px 12px rgba(0,0,0,0.2);
     z-index:999;
+}
+
+/* 已確認 */
+
+.checked-row{
+    background:#f0fff0;
+    opacity:0.7;
 }
 
 /* 滿額禮 */
@@ -224,6 +246,8 @@ input[type="number"]{
 
 <tr>
 
+<th class="checkbox-column">確認</th>
+
 <th class="name-column">商品名稱</th>
 
 <th class="price-column">單價</th>
@@ -236,7 +260,7 @@ input[type="number"]{
 
 <th class="image-column">圖片</th>
 
-<th class="action-column">刪除</th>
+<th class="action-column">操作</th>
 
 </tr>
 
@@ -281,6 +305,15 @@ input[type="number"]{
 <input type="text"
        class="gift-name"
        value="明信片">
+
+每次獲得
+
+<input type="number"
+       class="gift-count"
+       value="1"
+       min="1">
+
+份
 
 <button class="btn delete-btn"
         onclick="deleteGift(this)">
@@ -347,6 +380,9 @@ function calculateTotal(){
         const warning =
             row.querySelector(".warning");
 
+        const checkbox =
+            row.querySelector(".confirm-check");
+
         let quantity =
             parseInt(quantityInput.value) || 0;
 
@@ -375,6 +411,17 @@ function calculateTotal(){
             subtotal;
 
         total += subtotal;
+
+        // 確認狀態
+
+        if(checkbox.checked){
+
+            row.classList.add("checked-row");
+
+        }else{
+
+            row.classList.remove("checked-row");
+        }
     });
 
     document.getElementById("grandTotal").textContent =
@@ -395,6 +442,13 @@ function addProduct(){
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
+
+<td>
+
+<input type="checkbox"
+       class="confirm-check">
+
+</td>
 
 <td>
 
@@ -453,6 +507,20 @@ function addProduct(){
 
 <td>
 
+<button class="btn move-btn"
+        onclick="moveUp(this)">
+
+↑
+
+</button>
+
+<button class="btn move-btn"
+        onclick="moveDown(this)">
+
+↓
+
+</button>
+
 <button class="btn delete-btn"
         onclick="deleteRow(this)">
 
@@ -469,6 +537,38 @@ function addProduct(){
     addEventListeners();
 
     calculateTotal();
+}
+
+// 上移
+
+function moveUp(button){
+
+    const row = button.closest("tr");
+
+    const prev = row.previousElementSibling;
+
+    if(prev){
+
+        row.parentNode.insertBefore(row, prev);
+
+        saveData();
+    }
+}
+
+// 下移
+
+function moveDown(button){
+
+    const row = button.closest("tr");
+
+    const next = row.nextElementSibling;
+
+    if(next){
+
+        row.parentNode.insertBefore(next, row);
+
+        saveData();
+    }
 }
 
 // 刪除商品
@@ -532,6 +632,15 @@ function addGift(){
        class="gift-name"
        placeholder="滿額禮名稱">
 
+每次獲得
+
+<input type="number"
+       class="gift-count"
+       value="1"
+       min="1">
+
+份
+
 <button class="btn delete-btn"
         onclick="deleteGift(this)">
 
@@ -557,7 +666,7 @@ function deleteGift(button){
     calculateTotal();
 }
 
-// 檢查滿額禮
+// 滿額禮判斷
 
 function checkGift(total){
 
@@ -566,6 +675,9 @@ function checkGift(total){
 
     const names =
         document.querySelectorAll(".gift-name");
+
+    const counts =
+        document.querySelectorAll(".gift-count");
 
     let gifts = [];
 
@@ -577,10 +689,18 @@ function checkGift(total){
         const name =
             names[index].value;
 
+        const count =
+            parseInt(counts[index].value) || 1;
+
         if(total >= threshold &&
            name.trim() !== ""){
 
-            gifts.push(name);
+            const amount =
+                Math.floor(total / threshold) * count;
+
+            gifts.push(
+                `${name} × ${amount}`
+            );
         }
     });
 
@@ -615,6 +735,16 @@ function addEventListeners(){
             "input",
             calculateTotal
         );
+
+        input.removeEventListener(
+            "change",
+            calculateTotal
+        );
+
+        input.addEventListener(
+            "change",
+            calculateTotal
+        );
     });
 }
 
@@ -632,7 +762,7 @@ function saveData(){
     };
 
     localStorage.setItem(
-        "shoppingCalculatorLayoutFinal",
+        "shoppingCalculatorAdvanced",
         JSON.stringify(data)
     );
 }
@@ -643,7 +773,7 @@ function loadData(){
 
     const saved =
         localStorage.getItem(
-            "shoppingCalculatorLayoutFinal"
+            "shoppingCalculatorAdvanced"
         );
 
     if(saved){

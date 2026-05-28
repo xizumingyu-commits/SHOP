@@ -196,6 +196,15 @@ input[type="number"]{
     cursor:pointer;
 }
 
+.add-gift-btn{
+    background:#222;
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:10px 14px;
+    cursor:pointer;
+}
+
 /* 手機 */
 
 @media (max-width:768px){
@@ -385,15 +394,8 @@ input[type="number"]{
 
 </div>
 
-<button onclick="addGift()"
-        style="
-        background:#222;
-        color:white;
-        border:none;
-        border-radius:10px;
-        padding:10px 14px;
-        cursor:pointer;
-        ">
+<button class="add-gift-btn"
+        onclick="addGift()">
 
 ＋ 新增滿額禮
 
@@ -736,7 +738,7 @@ function saveData(){
     };
 
     localStorage.setItem(
-        "shoppingCalculatorData_v3",
+        "shoppingCalculatorData_v4",
         JSON.stringify(data)
     );
 }
@@ -747,7 +749,7 @@ function loadData(){
 
     const saved =
         localStorage.getItem(
-            "shoppingCalculatorData_v3"
+            "shoppingCalculatorData_v4"
         );
 
     if(saved){

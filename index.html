@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>周邊購物計算器</title>
+
+<style>
+
+body{
+    font-family:"Microsoft JhengHei", sans-serif;
+    background:#f5f5f5;
+    margin:0;
+    padding:10px;
+    color:#222;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:15px;
+    margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+.btn-area{
+    margin-bottom:15px;
+}
+
+button{
+    border:none;
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.add-btn{
+    background:#222;
+    color:white;
+}
+
+.delete-btn{
+    background:#ff4d4f;
+    color:white;
+}
+
+/* 表格 */
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px;
+}
+
+th, td{
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:center;
+    vertical-align:middle;
+}
+
+th{
+    background:#efefef;
+}
+
+/* 欄位大小 */
+
+.image-column{
+    width:120px;
+}
+
+.name-column{
+    width:120px;
+}
+
+.price-column{
+    width:80px;
+}
+
+.quantity-column{
+    width:80px;
+}
+
+.limit-column{
+    width:80px;
+}
+
+.subtotal-column{
+    width:90px;
+}
+
+.action-column{
+    width:80px;
+}
+
+/* 輸入框 */
+
+input{
+    padding:6px;
+    text-align:center;
+    font-size:14px;
+}
+
+input[type="text"]{
+    width:90px;
+}
+
+input[type="number"]{
+    width:55px;
+}
+
+/* 圖片 */
+
+.preview-img{
+    width:60px;
+    height:60px;
+    object-fit:cover;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+
+/* 小計 */
+
+.subtotal{
+    color:#d60000;
+    font-weight:bold;
+}
+
+/* 總金額 */
+
+.total{
+    text-align:right;
+    font-size:32px;
+    font-weight:bold;
+    color:#d60000;
+    margin-top:20px;
+}
+
+/* 警告 */
+
+.warning{
+    color:#ff4d4f;
+    font-size:12px;
+    margin-top:4px;
+}
+
+/* 滿額禮 */
+
+.giftResult{
+    margin-top:15px;
+    font-size:18px;
+    font-weight:bold;
+    color:#d60000;
+    line-height:1.8;
+}
+
+/* 手機 */
+
+@media (max-width:768px){
+
+    body{
+        padding:6px;
+    }
+
+    .card{
+        padding:10px;
+    }
+
+    .total{
+        font-size:24px;
+    }
+
+    button{
+        padding:8px 12px;
+        font-size:12px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>周邊購物計算器</h1>
+
+<div class="card">
+
+<div class="btn-area">
+
+<button class="add-btn"
+        onclick="addProduct()">
+
+＋ 新增商品
+
+</button>
+
+</div>
+
+<div class="table-wrapper">
+
+<table id="productTable">
+
+<thead>
+
+<tr>
+
+<th class="image-column">圖片</th>
+
+<th class="name-column">商品名稱</th>
+
+<th class="price-column">單價</th>
+
+<th class="quantity-column">數量</th>
+
+<th class="limit-column">限購</th>
+
+<th class="subtotal-column">小計</th>
+
+<th class="action-column">操作</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>
+
+<img class="preview-img"
+     src="https://via.placeholder.com/60">
+
+<br><br>
+
+<input type="file"
+       accept="image/*"
+       onchange="previewImage(this)">
+
+</td>
+
+<td>
+
+<input type="text"
+       value="掛布">
+
+</td>
+
+<td>
+
+<input type="number"
+       value="540"
+       min="0"
+       class="price">
+
+</td>
+
+<td>
+
+<input type="number"
+       value="1"
+       min="0"
+       class="quantity">
+
+<div class="warning"></div>
+
+</td>
+
+<td>
+
+<input type="number"
+       value="1"
+       min="1"
+       class="limit">
+
+</td>
+
+<td class="subtotal">
+
+540
+
+</td>
+
+<td>
+
+<button class="delete-btn"
+        onclick="deleteRow(this)">
+
+刪除
+
+</button>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<div class="total">
+
+總金額：
+<span id="grandTotal">540</span>
+元
+
+</div>
+
+</div>
+
+<!-- 滿額禮 -->
+
+<div class="card">
+
+<h2>滿額禮設定</h2>
+
+<div id="giftArea">
+
+<div class="giftRow"
+     style="margin-bottom:10px;">
+
+滿
+
+<input type="number"
+       class="giftThreshold"
+       value="3000"
+       min="0">
+
+元獲得
+
+<input type="text"
+       class="giftName"
+       value="明信片">
+
+</div>
+
+</div>
+
+<button class="add-btn"
+        onclick="addGift()">
+
+＋ 新增滿額禮
+
+</button>
+
+<div id="giftResult"
+     class="giftResult">
+
+尚未達到滿額禮門檻
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+// 計算總金額
+
+function calculateTotal(){
+
+    let total = 0;
+
+    const rows =
+        document.querySelectorAll("#productTable tbody tr");
+
+    rows.forEach(row => {
+
+        const price =
+            parseInt(
+                row.querySelector(".price").value
+            ) || 0;
+
+        const quantityInput =
+            row.querySelector(".quantity");
+
+        const limitInput =
+            row.querySelector(".limit");
+
+        const warning =
+            row.querySelector(".warning");
+
+        let quantity =
+            parseInt(quantityInput.value) || 0;
+
+        const limit =
+            parseInt(limitInput.value) || 1;
+
+        // 限購判斷
+
+        if(quantity > limit){
+
+            quantity = limit;
+
+            quantityInput.value = limit;
+
+            warning.textContent =
+                "超過限購數量！";
+
+        }else{
+
+            warning.textContent = "";
+        }
+
+        const subtotal = price * quantity;
+
+        row.querySelector(".subtotal").textContent =
+            subtotal;
+
+        total += subtotal;
+    });
+
+    document.getElementById("grandTotal").textContent =
+        total;
+
+    checkGift(total);
+
+    saveData();
+}
+
+// 新增商品
+
+function addProduct(){
+
+    const tbody =
+        document.querySelector("#productTable tbody");
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+
+<td>
+
+<img class="preview-img"
+     src="https://via.placeholder.com/60">
+
+<br><br>
+
+<input type="file"
+       accept="image/*"
+       onchange="previewImage(this)">
+
+</td>
+
+<td>
+
+<input type="text"
+       value="新商品">
+
+</td>
+
+<td>
+
+<input type="number"
+       value="0"
+       min="0"
+       class="price">
+
+</td>
+
+<td>
+
+<input type="number"
+       value="0"
+       min="0"
+       class="quantity">
+
+<div class="warning"></div>
+
+</td>
+
+<td>
+
+<input type="number"
+       value="1"
+       min="1"
+       class="limit">
+
+</td>
+
+<td class="subtotal">
+
+0
+
+</td>
+
+<td>
+
+<button class="delete-btn"
+        onclick="deleteRow(this)">
+
+刪除
+
+</button>
+
+</td>
+
+`;
+
+    tbody.appendChild(tr);
+
+    addEventListeners();
+
+    calculateTotal();
+}
+
+// 刪除商品
+
+function deleteRow(button){
+
+    button.closest("tr").remove();
+
+    calculateTotal();
+}
+
+// 圖片預覽
+
+function previewImage(input){
+
+    const file = input.files[0];
+
+    if(file){
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            const img =
+                input.parentElement.querySelector(".preview-img");
+
+            img.src = e.target.result;
+
+            saveData();
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+// 新增滿額禮
+
+function addGift(){
+
+    const area =
+        document.getElementById("giftArea");
+
+    const div =
+        document.createElement("div");
+
+    div.className = "giftRow";
+
+    div.style.marginBottom = "10px";
+
+    div.innerHTML = `
+
+滿
+
+<input type="number"
+       class="giftThreshold"
+       value="0"
+       min="0">
+
+元獲得
+
+<input type="text"
+       class="giftName"
+       value="新滿額禮">
+
+`;
+
+    area.appendChild(div);
+
+    addEventListeners();
+
+    calculateTotal();
+}
+
+// 滿額禮判斷
+
+function checkGift(total){
+
+    const thresholds =
+        document.querySelectorAll(".giftThreshold");
+
+    const names =
+        document.querySelectorAll(".giftName");
+
+    let gifts = [];
+
+    thresholds.forEach((item, index) => {
+
+        const threshold =
+            parseInt(item.value) || 0;
+
+        const name =
+            names[index].value;
+
+        if(total >= threshold &&
+           name.trim() !== ""){
+
+            gifts.push(name);
+        }
+    });
+
+    const result =
+        document.getElementById("giftResult");
+
+    if(gifts.length > 0){
+
+        result.innerHTML =
+            "🎁 可獲得滿額禮：<br>" +
+            gifts.join("<br>");
+
+    }else{
+
+        result.innerHTML =
+            "尚未達到滿額禮門檻";
+    }
+}
+
+// 綁定事件
+
+function addEventListeners(){
+
+    document.querySelectorAll("input").forEach(input => {
+
+        input.removeEventListener("input",
+                                  calculateTotal);
+
+        input.addEventListener("input",
+                               calculateTotal);
+    });
+}
+
+// 儲存資料
+
+function saveData(){
+
+    const data = {
+
+        products:
+            document.querySelector("#productTable tbody").innerHTML,
+
+        gifts:
+            document.getElementById("giftArea").innerHTML
+    };
+
+    localStorage.setItem(
+        "shoppingCalculatorData",
+        JSON.stringify(data)
+    );
+}
+
+// 讀取資料
+
+function loadData(){
+
+    const saved =
+        localStorage.getItem(
+            "shoppingCalculatorData"
+        );
+
+    if(saved){
+
+        const data =
+            JSON.parse(saved);
+
+        document.querySelector("#productTable tbody").innerHTML =
+            data.products;
+
+        document.getElementById("giftArea").innerHTML =
+            data.gifts;
+    }
+
+    addEventListeners();
+
+    calculateTotal();
+}
+
+loadData();
+
+</script>
+
+</body>
+
+</html>
